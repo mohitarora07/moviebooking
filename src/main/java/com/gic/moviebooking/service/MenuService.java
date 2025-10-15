@@ -3,6 +3,7 @@ package com.gic.moviebooking.service;
 import com.gic.moviebooking.constants.MenuConstants;
 import com.gic.moviebooking.model.Seat;
 import com.gic.moviebooking.sequence.BookingIdGenerator;
+import com.gic.moviebooking.validator.BookingValidationService;
 import com.gic.moviebooking.validator.PreMenuValidator;
 
 import java.util.List;
@@ -17,6 +18,19 @@ public class MenuService {
     public static void startService() {
         preMenu();
         mainMenu();
+    }
+
+    private static void preMenu() {
+        while (true) {
+            System.out.println(MenuConstants.PRE_MENU);
+            String[] input = scanner.nextLine().trim().split(" ");
+
+            if (!PreMenuValidator.validateInput(input))
+                continue;
+
+            bookingService = new BookingService(input[0], Integer.parseInt(input[1]), Integer.parseInt(input[2]));
+            break;
+        }
     }
 
     private static void mainMenu() {
@@ -83,13 +97,12 @@ public class MenuService {
             System.out.println(CONFIRM_BOOKING);
             String input = scanner.nextLine();
             if (!input.isEmpty()) {
-                bookingService.freeUpReservedSeats(reservedSeats);
                 int[] seatCoordinates = BookingValidationService.validateStartSeat(input, bookingService.getRows(), bookingService.getSeatsPerRow());
                 if (seatCoordinates[0] == -1) {
                     System.out.println(INVALID_START_SEAT);
-                    reservedSeats = bookingService.reserveDefaultSeats(ticketsToBook);
                     continue;
                 }
+                bookingService.freeUpReservedSeats(reservedSeats);
                reservedSeats = bookingService.reserveSeats(ticketsToBook, seatCoordinates);
             }else{
                 bookingService.bookReservedSeats(bookingId, reservedSeats);
@@ -98,17 +111,4 @@ public class MenuService {
             }
     }
 }
-
-    private static void preMenu() {
-        while (true) {
-            System.out.println(MenuConstants.PRE_MENU);
-            String[] input = scanner.nextLine().trim().split(" ");
-
-            if (!PreMenuValidator.validateInput(input))
-                continue;
-
-            bookingService = new BookingService(input[0], Integer.parseInt(input[1]), Integer.parseInt(input[2]));
-            break;
-        }
-    }
 }

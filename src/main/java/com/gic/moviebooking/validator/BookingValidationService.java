@@ -1,11 +1,11 @@
-package com.gic.moviebooking.service;
-
-import org.apache.commons.lang3.math.NumberUtils;
+package com.gic.moviebooking.validator;
 
 public class BookingValidationService {
 
     public static int validateAndParseTicketEntry(String ticketsToBookString, int totalAvailableSeats) {
-        if(!NumberUtils.isParsable(ticketsToBookString)){
+        try{
+            Integer.parseInt(ticketsToBookString);
+        } catch (NumberFormatException e){
             System.out.println("Invalid input. Please enter a valid number.");
             return -1;
         }
